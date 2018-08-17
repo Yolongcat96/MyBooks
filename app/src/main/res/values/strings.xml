@@ -1,0 +1,97 @@
+<resources>
+    <string name="app_name">MyBooks</string>
+    <!-- Login Screen -->
+    <string name="btn_start">START</string>
+
+    <!-- Main List screen -->
+    <string name="list_top_title">My Book List</string>
+    <string name="no_book_list">It is an empty.</string>
+
+    <!-- Editor Screen -->
+    <!-- Label for editor menu option to save a book and leave editor [CHAR LIMIT=20] -->
+    <string name="action_save">Save</string>
+
+    <!-- menu icon at the book overview -->
+    <string name="action_edit">Edit</string>
+
+    <!-- Label for editor overflow menu option that deletes the current book [CHAR LIMIT=20] -->
+    <string name="action_delete">Delete</string>
+
+    <!-- create a new book -->
+    <string name="editor_activity_title_new_book">Add a Book</string>
+
+    <!-- edit the book -->
+    <string name="editor_activity_title_edit_book">Edit the Book</string>
+
+    <string name="book_detail">Book Overview</string>
+
+    <!-- Text for book title field in the editor [CHAR LIMIT=30] -->
+    <string name="category_book_title">Book Title</string>
+
+    <!-- Text for author name in the editor [CHAR LIMIT=30] -->
+    <string name="category_author_name">Author Name</string>
+
+    <!-- Label for genre information in the editor [CHAR LIMIT=30] -->
+    <string name="category_genre">Genre</string>
+
+    <!-- Label for quantity information in the editor [CHAR LIMIT=30] -->
+    <string name="category_quantity">Quantity</string>
+
+    <!-- Label for price information in the editor [CHAR LIMIT=30] -->
+    <string name="category_price">Price($)</string>
+
+    <!-- Label for supplier name information in the editor [CHAR LIMIT=30] -->
+    <string name="category_supplier_name">Supplier Name</string>
+
+    <!-- Label for price information in the editor [CHAR LIMIT=30] -->
+    <string name="category_supplier_phone">Supplier Phone</string>
+
+    <!-- Text hint for book title field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_book_title">Title</string>
+
+    <!-- Text hint for author in the editor [CHAR LIMIT=30] -->
+    <string name="hint_author_name">Author</string>
+
+    <!-- Text hint for name field in the editor [CHAR LIMIT=30] -->
+    <string name="hint_quantity">Quantity</string>
+
+    <!-- Label hint for price information in the editor [CHAR LIMIT=30] -->
+    <string name="hint_price">Price</string>
+
+    <!-- Label hint for supplier name information in the editor [CHAR LIMIT=30] -->
+    <string name="hint_supplier_name">Supplier Name</string>
+
+    <!-- Label hint for supplier phone information in the editor [CHAR LIMIT=30] -->
+    <string name="hint_supplier_phone">Supplier Phone</string>
+
+    <!-- Units for price of a book ($) [CHAR LIMIT=5] -->
+    <string name="unit_price">$</string>
+
+    <!-- extra -->
+    <string name="callingAct">callingActivity</string>
+    <string name="MainList">MainList</string>
+    <string name="BookDetail">BookDetail</string>
+    <string name="bookRowId">bookRowId</string>
+
+    <!-- Types of Genre -->
+    <string name="genre_novel">Novel</string>
+    <string name="genre_fantasy">Fantasy</string>
+    <string name="genre_historical_fiction">Historical Fiction</string>
+    <string name="genre_non_fiction">Non-fiction</string>
+    <string name="genre_romance">Romance</string>
+
+    <!-- information texts -->
+    <string name="saving_success">The book saved with row id: </string>
+
+    <!-- Warning Texts -->
+    <string name="not_decided">Not decided</string>
+    <string name="error_saving">Error with saving a book</string>
+    <string name="error_fetching">Can not find the information about the chosen book.</string>
+    <string name="no_title">No Title</string>
+    <string name="no_author">No Author Name</string>
+    <string name="no_quantity">No Quantity</string>
+    <string name="no_price">No Price</string>
+    <string name="no_supplier_name">No Supplier Name</string>
+    <string name="no_supplier_phone">No Supplier Phone Number</string>
+
+</resources>

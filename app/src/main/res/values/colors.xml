@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#639184</color>
+    <color name="colorPrimaryDark">#324942</color>
+    <color name="colorAccent">#7d4bbb</color>
+
+    <!-- Login Screen -->
+    <color name="start_btn_color">#639184</color>
+
+    <!-- List Screen -->
+    <color name="list_box_color">#e0e9e6</color>
+    <color name="book_title_color">#639184</color>
+    <color name="book_author_color">#000000</color>
+    <color name="book_price_color">#a26764</color>
+    <color name="other_item_color">#324942</color>
+    <color name="fab_button_color">#8b413d</color>
+
+</resources>

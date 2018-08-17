@@ -1,0 +1,193 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="@dimen/activity_margin"
+    tools:context=".BookDetailActivity">
+
+    <!-- Book Title category -->
+    <LinearLayout
+        android:id="@+id/container_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_book_title" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/book_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textAllCaps="true"
+            android:textColor="@color/book_title_color"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            tools:text="Harry Potter" />
+    </LinearLayout>
+
+    <!-- Author name category -->
+    <LinearLayout
+        android:id="@+id/container_author"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_author_name" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textColor="@color/book_author_color"
+            android:textSize="18sp"
+            tools:text="J.K.Rowling" />
+    </LinearLayout>
+
+    <!-- Genre category -->
+    <LinearLayout
+        android:id="@+id/container_genre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_genre" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/genre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textColor="@color/other_item_color"
+            android:textSize="18sp"
+            tools:text="Fantasy" />
+    </LinearLayout>
+
+    <!-- Price category -->
+    <LinearLayout
+        android:id="@+id/container_price"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_price" />
+
+        <!-- Units for Price ($) -->
+        <TextView
+            android:id="@+id/label_price_units"
+            style="@style/EditorUnitsStyle"
+            android:text="@string/unit_price" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textColor="@color/book_price_color"
+            android:textSize="18sp"
+            tools:text="10" />
+
+    </LinearLayout>
+
+    <!-- Quantity category -->
+    <LinearLayout
+        android:id="@+id/container_quantity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_quantity" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/quantity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textColor="@color/other_item_color"
+            android:textSize="18sp"
+            tools:text="2" />
+    </LinearLayout>
+
+    <!-- Supplier name category -->
+    <LinearLayout
+        android:id="@+id/container_supplier_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_supplier_name" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/supplier_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textColor="@color/other_item_color"
+            android:textSize="18sp"
+            tools:text="ABC publish Inc." />
+    </LinearLayout>
+
+    <!-- Supplier phone category -->
+    <LinearLayout
+        android:id="@+id/container_supplier_phone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <!-- Label -->
+        <TextView
+            style="@style/CategoryStyle"
+            android:text="@string/category_supplier_phone" />
+
+        <!-- Text -->
+        <TextView
+            android:id="@+id/supplier_phone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="3"
+            android:textColor="@color/other_item_color"
+            android:textSize="18sp"
+            tools:text="6506446078" />
+    </LinearLayout>
+
+</LinearLayout>
