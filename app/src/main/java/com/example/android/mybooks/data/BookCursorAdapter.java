@@ -12,7 +12,7 @@ import android.widget.TextView;
 import com.example.android.mybooks.R;
 import com.example.android.mybooks.data.BookContract.BookEntry;
 
-public class BookListAdapter extends CursorAdapter {
+public class BookCursorAdapter extends CursorAdapter {
 
     private final int[] sampleBookImages = {
             R.drawable.ic_sample_book1,
@@ -21,7 +21,7 @@ public class BookListAdapter extends CursorAdapter {
             R.drawable.ic_sample_book4
     };
 
-    public BookListAdapter(Context context, Cursor cursor) {
+    public BookCursorAdapter(Context context, Cursor cursor) {
         super(context, cursor, 0);
     }
 
@@ -36,19 +36,24 @@ public class BookListAdapter extends CursorAdapter {
         TextView bookTitleView = view.findViewById(R.id.book_title);
         TextView authorView = view.findViewById(R.id.book_author);
         TextView priceView = view.findViewById(R.id.book_price);
+        TextView quantityTextView = view.findViewById(R.id.book_quantity);
         ImageView thumnailView = view.findViewById(R.id.article_thumbnail);
         int titleColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE);
         int authorColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_AUTHOR_NAME);
         int priceColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_PRICE);
+        int quantityColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_QUANTITY);
         final int bookIdColumnindex = cursor.getInt(cursor.getColumnIndex(BookEntry._ID));
+
         String bookTitle = cursor.getString(titleColumnIndex);
         String author = cursor.getString(authorColumnIndex);
         double price = cursor.getDouble(priceColumnIndex);
+        int quantity = cursor.getInt(quantityColumnIndex);
         bookTitleView.setText(bookTitle);
         authorView.setText(author);
         priceView.setText("$" + String.valueOf(price));
         //set the sample book image
         int imageIndex = bookIdColumnindex % 4;
         thumnailView.setImageResource(sampleBookImages[imageIndex]);
+        quantityTextView.setText(" (Stock:" + String.valueOf(quantity) + ")");
     }
 }

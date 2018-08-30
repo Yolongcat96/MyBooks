@@ -12,6 +12,7 @@
     <color name="book_title_color">#639184</color>
     <color name="book_author_color">#000000</color>
     <color name="book_price_color">#a26764</color>
+    <color name="book_quantity_color">#751212</color>
     <color name="other_item_color">#324942</color>
     <color name="fab_button_color">#8b413d</color>
 

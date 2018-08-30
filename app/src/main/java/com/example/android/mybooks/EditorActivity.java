@@ -1,14 +1,19 @@
 package com.example.android.mybooks;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -19,7 +24,11 @@ import android.widget.Toast;
 import com.example.android.mybooks.data.BookContract.BookEntry;
 import com.example.android.mybooks.data.BookDbHelper;
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private static final int EXISTING_BOOK_LOADER = 0;
+    private Uri mCurrentBookUri;
+    private boolean mBookHasChanged = false;
 
     /**
      * EditText field to enter the book title
@@ -72,10 +81,6 @@ public class EditorActivity extends AppCompatActivity {
     private String bookID;
     private Cursor mCursor;
 
-    // This activity can be called from two different activities: MainList and BookDetail.
-    // According to the calling activity, the additional setup is needed.
-    private boolean hasPreviousInform;
-
     /**
      * Gender of the pet. The possible values are:
      * 0:novel, 1 for fantasy, 2 for historical fiction, 3 for non fiction, and 4 for romance
@@ -88,104 +93,29 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
         // Set input values
         setInputValues();
-        // Set drop down
-        setupDropdown();
-        // Get information from the previous activity
-        getInformationFromPreviousActivity();
+        // Setup spinner
+        setupSpinner();
+        // Get data from the previous activity
+        //getInformationFromPreviousActivity();
+        getDataFromPreviousActivity();
         // Set title
         setTitle();
+        // kick off the loader
+        getLoaderManager().initLoader(EXISTING_BOOK_LOADER, null, this);
     }
 
-    // Get the information from the previous activity
-    private void getInformationFromPreviousActivity() {
-        if (getIntent() != null) {
-            // get an item name
-            String preActivityName = getIntent().getStringExtra(getString(R.string.callingAct));
-            if (preActivityName.compareTo(getString(R.string.BookDetail)) == 0) {
-                hasPreviousInform = true;
-                if (getIntent() != null) {
-                    // get an item name
-                    bookRowId = getIntent().getIntExtra(getString(R.string.bookRowId), -1);
-                }
-                if (bookRowId == -1) {
-                    Toast.makeText(this, getString(R.string.error_fetching), Toast.LENGTH_SHORT).show();
-                } else {
-                    setVariables();
-                }
-            } else {
-                hasPreviousInform = false;
-            }
+    private void getDataFromPreviousActivity() {
+        Intent intent = getIntent();
+        mCurrentBookUri = intent.getData();
+    }
+
+    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            mBookHasChanged = true;
+            return false;
         }
-    }
-
-    private void setInformation() {
-        // Figure out the index of each column
-        int IDCI = mCursor.getColumnIndex(BookEntry._ID);
-        int titleCI = mCursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE); // Book title column index
-        int authorCI = mCursor.getColumnIndex(BookEntry.COLUMN_AUTHOR_NAME);
-        int genreCI = mCursor.getColumnIndex(BookEntry.COLUMN_GENRE);
-        int quantityCI = mCursor.getColumnIndex(BookEntry.COLUMN_QUANTITY);
-        int priceCI = mCursor.getColumnIndex(BookEntry.COLUMN_PRICE);
-        int supplierNameCI = mCursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_NAME);
-        int supplierPhoneCI = mCursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_PHONE);
-        int currentRow = 0;
-        // Finding the chosen book information and set it on the xml
-        while (mCursor.moveToNext()) {
-            // choose information
-            if (currentRow == bookRowId) {
-                // Use that index to extract the string or Int value of the word
-                // at the current row the cursor is on.
-                bookID = mCursor.getString(IDCI);
-                String currTitle = mCursor.getString(titleCI);
-                String currAuthor = mCursor.getString(authorCI);
-                int currGenre = mCursor.getInt(genreCI);
-                int currQuantity = mCursor.getInt(quantityCI);
-                double currPrice = mCursor.getDouble(priceCI);
-                String currSName = mCursor.getString(supplierNameCI);
-                String currSPhone = mCursor.getString(supplierPhoneCI);
-                mBookTitleEditText.setText(currTitle);
-                mAuthorNameEditText.setText(currAuthor);
-                mQuantityEditText.setText(String.valueOf(currQuantity));
-                mPriceEditText.setText(String.valueOf(currPrice));
-                mSupplierNameEditText.setText(currSName);
-                mSupplierPhoneEditText.setText(currSPhone);
-                // set the received genre info
-                mGenreSpinner.setSelection(currGenre);
-            }
-            currentRow++;
-        }
-    }
-
-    private void getCurrentCursor() {
-        mDbHelper = new BookDbHelper(this);
-        // create and open a database to read from it
-        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-        String[] projection = {
-                BookEntry._ID,
-                BookEntry.COLUMN_BOOK_TITLE,
-                BookEntry.COLUMN_AUTHOR_NAME,
-                BookEntry.COLUMN_GENRE,
-                BookEntry.COLUMN_QUANTITY,
-                BookEntry.COLUMN_PRICE,
-                BookEntry.COLUMN_SUPPLIER_NAME,
-                BookEntry.COLUMN_SUPPLIER_PHONE
-        };
-        mCursor = db.query(
-                BookEntry.TABLE_NAME,
-                projection,
-                null,
-                null,
-                null,
-                null,
-                null);
-    }
-
-    private void setVariables() {
-        //1. get the current cursor
-        getCurrentCursor();
-        // 2. set information
-        setInformation();
-    }
+    };
 
     private void setInputValues() {
         mBookTitleEditText = findViewById(R.id.edit_book_title);
@@ -195,19 +125,28 @@ public class EditorActivity extends AppCompatActivity {
         mPriceEditText = findViewById(R.id.edit_price);
         mSupplierNameEditText = findViewById(R.id.edit_supplier_name);
         mSupplierPhoneEditText = findViewById(R.id.edit_supplier_phone);
+        // add touch listener
+        mBookTitleEditText.setOnTouchListener(mTouchListener);
+        mAuthorNameEditText.setOnTouchListener(mTouchListener);
+        mGenreSpinner.setOnTouchListener(mTouchListener);
+        mQuantityEditText.setOnTouchListener(mTouchListener);
+        mPriceEditText.setOnTouchListener(mTouchListener);
+        mSupplierNameEditText.setOnTouchListener(mTouchListener);
+        mSupplierPhoneEditText.setOnTouchListener(mTouchListener);
+
     }
 
     private void setTitle() {
-        if (hasPreviousInform) {
-            getSupportActionBar().setTitle(getResources().getString(R.string.editor_activity_title_edit_book));
-        } else {
+        if (mCurrentBookUri == null) {
             getSupportActionBar().setTitle(getResources().getString(R.string.editor_activity_title_new_book));
+        } else {
+            getSupportActionBar().setTitle(getResources().getString(R.string.editor_activity_title_edit_book));
         }
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
 
-    private void setupDropdown() {
+    private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
         ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
@@ -256,28 +195,6 @@ public class EditorActivity extends AppCompatActivity {
         return values;
     }
 
-    // Get user input from editor and save new pet into database.
-    private void insertBook() {
-        // get information from user
-        getInfoFromUser();
-        // Create database helper
-        BookDbHelper mDbHelper = new BookDbHelper(this);
-        // Get the database in write mode
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
-        // Create a ContentValues object where column names are the keys,
-        // and book attributes from the editor are the values.
-        ContentValues values = setValues();
-        long newRowId = db.insert(BookEntry.TABLE_NAME, null, values);
-        // show a toast message depending on whether or not the insertion was successful
-        if (newRowId == -1) {
-            // If the row ID is -1, then there was an error with insertion.
-            Toast.makeText(this, getString(R.string.error_saving), Toast.LENGTH_SHORT).show();
-        } else {
-            // Otherwise, the insertion was successful and we can display a toast with the row ID.
-            Toast.makeText(this, getString(R.string.saving_success) + newRowId, Toast.LENGTH_SHORT).show();
-        }
-    }
-
     // Get information from user-typing
     private void getInfoFromUser() {
         bookTitleString = mBookTitleEditText.getText().toString().trim();
@@ -306,13 +223,45 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.action_save:
                 actionSave();
                 return true;
-            // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
                 // exit activity
                 goToMainList();
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    // Get user input from editor and save new pet into database.
+    private void saveBook() {
+        // get the data from the user
+        getInfoFromUser();
+        // Create a ContentValues object where column names are the keys,
+        // and book attributes from the editor are the values.
+        // create content values
+        ContentValues values = setValues();
+        // show a toast message depending on whether or not the insertion was successful
+        if (mCurrentBookUri == null) {
+            // This is a new pet, so insert a new pet into the provider
+            // returning the content URI for the new pet
+            Uri newUri = getContentResolver().insert(BookEntry.CONTENT_URI, values);
+            if (newUri == null) {
+                Toast.makeText(this, getString(R.string.editor_insert_book_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.editor_insert_book_successful), Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            int rowsAffected = getContentResolver().update(mCurrentBookUri, values, null, null);
+            if (rowsAffected == 0) {
+                Toast.makeText(this, getString(R.string.editor_insert_book_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, getString(R.string.editor_insert_book_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
     }
 
     private void update() {
@@ -327,14 +276,14 @@ public class EditorActivity extends AppCompatActivity {
     private void actionSave() {
         if (checkAllInfoInserted()) {
             // Update the already exist row
-            if (hasPreviousInform) {
+            if (mCurrentBookUri != null) {
                 // Update the information of the chosen book and i to the database
                 update();
                 // Go to the MainList
                 goToMainList();
             } else {
                 // Insert the new book to the database
-                insertBook();
+                saveBook();
                 // Go to the MainList
                 goToMainList();
             }
@@ -345,6 +294,7 @@ public class EditorActivity extends AppCompatActivity {
     private boolean checkAllInfoInserted() {
         // Get information from user
         getInfoFromUser();
+        // Check all is inserted
         if (TextUtils.isEmpty(bookTitleString)) {
             Toast.makeText(this, getString(R.string.no_title), Toast.LENGTH_SHORT).show();
             return false;
@@ -375,4 +325,74 @@ public class EditorActivity extends AppCompatActivity {
         startActivity(_MainListActivity);
     }
 
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        // Define projection
+        String[] projection = {
+                BookEntry._ID,
+                BookEntry.COLUMN_BOOK_TITLE,
+                BookEntry.COLUMN_AUTHOR_NAME,
+                BookEntry.COLUMN_GENRE,
+                BookEntry.COLUMN_QUANTITY,
+                BookEntry.COLUMN_PRICE,
+                BookEntry.COLUMN_SUPPLIER_NAME,
+                BookEntry.COLUMN_SUPPLIER_PHONE
+        };
+        if (mCurrentBookUri == null) {
+            return null;
+        } else {
+            return new CursorLoader(this,
+                    mCurrentBookUri,
+                    projection,
+                    null,
+                    null,
+                    null);
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            // Find the columns of pet attributes that we're interested in
+            int IDCI = cursor.getColumnIndex(BookEntry._ID);
+            int titleCI = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE); // Book title column index
+            int authorCI = cursor.getColumnIndex(BookEntry.COLUMN_AUTHOR_NAME);
+            int genreCI = cursor.getColumnIndex(BookEntry.COLUMN_GENRE);
+            int quantityCI = cursor.getColumnIndex(BookEntry.COLUMN_QUANTITY);
+            int priceCI = cursor.getColumnIndex(BookEntry.COLUMN_PRICE);
+            int supplierNameCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_NAME);
+            int supplierPhoneCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_PHONE);
+            // Extract out the value from the Cursor for the given column index
+            bookID = cursor.getString(IDCI);
+            String currTitle = cursor.getString(titleCI);
+            String currAuthor = cursor.getString(authorCI);
+            int currGenre = cursor.getInt(genreCI);
+            int currQuantity = cursor.getInt(quantityCI);
+            double currPrice = cursor.getDouble(priceCI);
+            String currSName = cursor.getString(supplierNameCI);
+            String currSPhone = cursor.getString(supplierPhoneCI);
+            // Set text on EditText
+            mBookTitleEditText.setText(currTitle);
+            mAuthorNameEditText.setText(currAuthor);
+            mQuantityEditText.setText(String.valueOf(currQuantity));
+            mPriceEditText.setText(String.valueOf(currPrice));
+            mSupplierNameEditText.setText(currSName);
+            mSupplierPhoneEditText.setText(currSPhone);
+            // set the received genre info
+            mGenreSpinner.setSelection(currGenre);
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mBookTitleEditText.setText("");
+        mAuthorNameEditText.setText("");
+        mQuantityEditText.setText(String.valueOf(0));
+        mPriceEditText.setText(String.valueOf(0.0));
+        mSupplierNameEditText.setText("");
+        mSupplierPhoneEditText.setText("");
+        // set the received genre info
+        mGenreSpinner.setSelection(0);
+    }
 }

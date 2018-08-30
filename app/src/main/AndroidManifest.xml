@@ -18,6 +18,10 @@
         <activity android:name=".MainListActivity" />
         <activity android:name=".EditorActivity" />
         <activity android:name=".BookDetailActivity"/>
+        <provider
+            android:name=".data.BookProvider"
+            android:authorities="com.example.android.mybooks"
+            android:exported="false" />
     </application>
 
 </manifest>
