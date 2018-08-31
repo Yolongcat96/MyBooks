@@ -8,8 +8,8 @@ public class BookContract {
 
     // set several constant variables
     public static final String CONTENT_AUTHORITY = "com.example.android.mybooks";
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
-    public static final String PATH_BOOKS = "books";
+    private static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    private static final String PATH_BOOKS = "books";
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor
@@ -54,7 +54,7 @@ public class BookContract {
         // Supplier Name:  TEXT
         public final static String COLUMN_SUPPLIER_NAME = "supplier_name";
 
-        // Supplier Phone:  TEXT
+        // Supplier Phone number:  TEXT
         public final static String COLUMN_SUPPLIER_PHONE = "supplier_phone";
 
         public static final String CONTENT_LIST_TYPE =
@@ -62,7 +62,6 @@ public class BookContract {
 
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_BOOKS;
-
 
     }
 }

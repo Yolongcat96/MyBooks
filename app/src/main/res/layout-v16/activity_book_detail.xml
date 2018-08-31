@@ -127,17 +127,35 @@
             style="@style/CategoryStyle"
             android:text="@string/category_quantity" />
 
+        <ImageView
+            android:id="@+id/decreaseImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginRight="15dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_decrease_btn" />
+
         <!-- Text -->
         <TextView
             android:id="@+id/quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:ellipsize="end"
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/other_item_color"
             android:textSize="18sp"
             tools:text="2" />
+
+        <ImageView
+            android:id="@+id/increaseImageView"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="15dp"
+            android:src="@drawable/ic_increase_btn" />
+
     </LinearLayout>
 
     <!-- Supplier name category -->
@@ -189,5 +207,13 @@
             android:textSize="18sp"
             tools:text="6506446078" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/orderImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="25dp"
+        android:src="@drawable/ic_order_btn" />
 
 </LinearLayout>

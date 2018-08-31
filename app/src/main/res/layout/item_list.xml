@@ -73,10 +73,11 @@
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/directive_arrow"
+        android:id="@+id/sale_btn"
         android:layout_width="60dp"
-        android:layout_height="match_parent"
-        android:src="@drawable/ic_click_arrow" />
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_sale_btn" />
 
 </LinearLayout>
 

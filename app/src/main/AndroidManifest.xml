@@ -16,7 +16,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainListActivity" />
-        <activity android:name=".EditorActivity" />
+        <activity
+            android:name=".EditorActivity"
+            android:parentActivityName=".MainListActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainListActivity" />
+        </activity>
         <activity android:name=".BookDetailActivity"/>
         <provider
             android:name=".data.BookProvider"

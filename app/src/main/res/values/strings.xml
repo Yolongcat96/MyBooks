@@ -89,6 +89,7 @@
     <string name="n_a">N/A</string>
     <string name="editor_insert_book_successful">The book is successfully saved.</string>
     <string name="delete_all_successfully">All books are successfully deleted.</string>
+    <string name="sell_one_book">1 Book was sold!</string>
 
     <!-- Toast message in editor when current book was successfully deleted [CHAR LIMIT=NONE] -->
     <string name="editor_delete_book_successful">Book deleted</string>
@@ -109,7 +110,24 @@
     <string name="no_price">No Price</string>
     <string name="no_supplier_name">No Supplier Name</string>
     <string name="no_supplier_phone">No Supplier Phone Number</string>
+    <string name="no_enough_phone_length">Not enough phone number length</string>
     <string name="not_supported">Insertion is not supported for </string>
     <string name="editor_insert_book_failed">Error with saving book</string>
+    <string name="no_more_book">This book is out of stock.</string>
+    <string name="no_negative">You cannot go down under 0.</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep Editing</string>
+    <string name="unsaved_changes_dialog_msg">Do you want to discard the changes?</string>
+    <string name="book_require_title">A book requires a name.</string>
+    <string name="book_require_authorname">A book requires an author name.</string>
+    <string name="book_require_genre">A book requires a genre type.</string>
+    <string name="book_require_supplier">A book requires a supplier name.</string>
+    <string name="fail_insertion_for">Failed to insert row for </string>
+    <string name="deletion_not_supported_for">Deletion is no supported for </string>
+    <string name="update_not_supported_for">Update is not supported for </string>
+    <string name="unknown_uri">Unknown URI </string>
+    <string name="with_match"> with match </string>
+    <string name="delete_all_fail">Fail to delete all books.</string>
+    <string name="no_internet_available">No Intent available to handle action</string>
 
 </resources>

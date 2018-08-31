@@ -7,13 +7,15 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+
+import com.example.android.mybooks.R;
 import com.example.android.mybooks.data.BookContract.BookEntry;
 import android.util.Log;
 
 public class BookProvider extends ContentProvider {
 
     // Tag for the log messages
-    public static final String LOG_TAG = BookProvider.class.getSimpleName();
+    private static final String LOG_TAG = BookProvider.class.getSimpleName();
 
     // URI matcher code for the content URI for the books table
     private static final int BOOKS = 100;
@@ -52,12 +54,10 @@ public class BookProvider extends ContentProvider {
         // Figure out if the URI matcher can match the URI to a specific code
         int match = sUriMatcher.match(uri);
 
-        Log.d(LOG_TAG, "match index: " + match);
-
         switch (match) {
 
             case BOOKS:
-                // For the BOOKS code, query the pets table directly with the given
+                // For the BOOKS code, query the books table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
                 // could contain multiple rows of the books table.
                 cursor = database.query(BookEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, sortOrder);
@@ -74,7 +74,7 @@ public class BookProvider extends ContentProvider {
                         null, null, sortOrder);
                 break;
             default:
-                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+                throw new IllegalArgumentException(getContext().getString(R.string.not_supported) + uri);
         }
 
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -88,7 +88,7 @@ public class BookProvider extends ContentProvider {
             case BOOKS:
                 return insertBook(uri, contentValues);
             default:
-                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+                throw new IllegalArgumentException(getContext().getString(R.string.not_supported) + uri);
 
         }
 
@@ -100,19 +100,19 @@ public class BookProvider extends ContentProvider {
         // 1. Book Title
         String name = values.getAsString(BookEntry.COLUMN_BOOK_TITLE);
         if (name == null) {
-            throw new IllegalArgumentException("Book requires a name");
+            throw new IllegalArgumentException(getContext().getString(R.string.book_require_title));
         }
 
         // 2. Author Name
         String authorName = values.getAsString(BookEntry.COLUMN_AUTHOR_NAME);
         if (authorName == null) {
-            throw new IllegalArgumentException("Book requires an author name");
+            throw new IllegalArgumentException(getContext().getString(R.string.book_require_authorname));
         }
 
         // 3. Book Genre
         String genreType = values.getAsString(BookEntry.COLUMN_GENRE);
         if (genreType == null) {
-            throw new IllegalArgumentException("Book requires a genre type");
+            throw new IllegalArgumentException(getContext().getString(R.string.book_require_genre));
         }
 
         // 4. Quantity: number of a book
@@ -126,7 +126,7 @@ public class BookProvider extends ContentProvider {
         // 6. Supplier Name
         String supplierName = values.getAsString(BookEntry.COLUMN_SUPPLIER_NAME);
         if (supplierName == null) {
-            throw new IllegalArgumentException("Book requires a supplier name");
+            throw new IllegalArgumentException(getContext().getString(R.string.book_require_supplier));
         }
 
         // 7. Supplier contact information: phone number
@@ -139,7 +139,7 @@ public class BookProvider extends ContentProvider {
         long id = database.insert(BookEntry.TABLE_NAME, null, values);
 
         if (id == -1) {
-            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            Log.e(LOG_TAG, getContext().getString(R.string.fail_insertion_for) + uri);
             return null;
         }
 
@@ -173,7 +173,7 @@ public class BookProvider extends ContentProvider {
                 rowsDeleted = database.delete(BookEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
-                throw new IllegalArgumentException("Deletion is no supported for " +uri);
+                throw new IllegalArgumentException(getContext().getString(R.string.deletion_not_supported_for) +uri);
         }
 
         // If 1 or more rows were deleted, then notify all listeners that the data at the
@@ -198,7 +198,7 @@ public class BookProvider extends ContentProvider {
                 selectionArgs = new String[] {String.valueOf(ContentUris.parseId(uri))};
                 return updateBook(uri, contentValues, selection, selectionArgs);
             default:
-                throw new IllegalArgumentException("Update is not supported for " + uri);
+                throw new IllegalArgumentException(getContext().getString(R.string.update_not_supported_for) + uri);
         }
 
     }
@@ -209,7 +209,7 @@ public class BookProvider extends ContentProvider {
         if (values.containsKey(BookEntry.COLUMN_BOOK_TITLE)) {
             String booktitle = values.getAsString(BookEntry.COLUMN_BOOK_TITLE);
             if (booktitle == null) {
-                throw new IllegalArgumentException("Book requires a name");
+                throw new IllegalArgumentException(getContext().getString(R.string.book_require_title));
             }
         }
 
@@ -217,7 +217,7 @@ public class BookProvider extends ContentProvider {
         if (values.containsKey(BookEntry.COLUMN_AUTHOR_NAME)) {
             String authorName = values.getAsString(BookEntry.COLUMN_AUTHOR_NAME);
             if (authorName == null) {
-                throw new IllegalArgumentException("Book requires an author name");
+                throw new IllegalArgumentException(getContext().getString(R.string.book_require_authorname));
             }
         }
 
@@ -225,7 +225,7 @@ public class BookProvider extends ContentProvider {
         if (values.containsKey(BookEntry.COLUMN_GENRE)) {
             String genreType = values.getAsString(BookEntry.COLUMN_GENRE);
             if (genreType == null) {
-                throw new IllegalArgumentException("Book requires a genre type");
+                throw new IllegalArgumentException(getContext().getString(R.string.book_require_genre));
             }
         }
 
@@ -245,14 +245,13 @@ public class BookProvider extends ContentProvider {
         if (values.containsKey(BookEntry.COLUMN_SUPPLIER_NAME)) {
             String supplierName = values.getAsString(BookEntry.COLUMN_SUPPLIER_NAME);
             if (supplierName == null) {
-                throw new IllegalArgumentException("Book requires a supplier name");
+                throw new IllegalArgumentException(getContext().getString(R.string.book_require_supplier));
             }
         }
 
         // 7. Supplier contact information: phone number
         if (values.containsKey(BookEntry.COLUMN_SUPPLIER_PHONE)) {
             String supplierPhoneString = values.getAsString(BookEntry.COLUMN_SUPPLIER_PHONE);
-            int supplierPhone = Integer.parseInt(supplierPhoneString);
         }
 
         // If there are no values to update, then don't try to update the database
@@ -287,7 +286,7 @@ public class BookProvider extends ContentProvider {
             case BOOK_ID:
                 return BookEntry.CONTENT_ITEM_TYPE;
             default:
-                throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
+                throw new IllegalStateException(getContext().getString(R.string.unknown_uri) + uri + getContext().getString(R.string.with_match) + match);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.example.android.mybooks;
 
+import android.content.ContentValues;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
@@ -7,12 +8,15 @@ import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,6 +29,9 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
     private Uri mCurrentBookUri;
     private long currentBookId;
 
+    private TextView mQuantityTV;
+    private TextView mSupplierPhoneTV;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +42,8 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
         setTitle();
         // Kick off the loader
         getLoaderManager().initLoader(EXISTING_PET_LOADER, null, this);
+        // set clickable imageViews
+        setClickableImageViews();
     }
 
     @Override
@@ -57,7 +66,7 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
             case R.id.action_delete:
                 showDeleteConfirmationDialog();
                 return true;
-            // Respond to a click on the "Up" arrow button in the app bar
+            // Respond to a click on the "Left" arrow button in the app bar
             case android.R.id.home:
                 // exit activity
                 finish();
@@ -107,28 +116,26 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
             String currSName = cursor.getString(supplierNameCI);
             String currSPhone = cursor.getString(supplierPhoneCI);
             // get the TextViews from the xml
-            TextView titleTV = findViewById(R.id.book_title);
-            TextView authorTV = findViewById(R.id.author);
-            TextView genreTV = findViewById(R.id.genre);
-            TextView quantityTV = findViewById(R.id.quantity);
-            TextView priceTV = findViewById(R.id.price);
-            TextView supplierNameTV = findViewById(R.id.supplier_name);
-            TextView supplierPhoneTV = findViewById(R.id.supplier_phone);
+            TextView mTitleTV = findViewById(R.id.book_title);
+            TextView mAuthorTV = findViewById(R.id.author);
+            TextView mGenreTV = findViewById(R.id.genre);
+            mQuantityTV = findViewById(R.id.quantity);
+            TextView mPriceTV = findViewById(R.id.price);
+            TextView mSupplierNameTV = findViewById(R.id.supplier_name);
+            mSupplierPhoneTV = findViewById(R.id.supplier_phone);
             // Set text on EditText
-            titleTV.setText(currTitle);
-            authorTV.setText(currAuthor);
-            genreTV.setText(getGenreWithIndex(currGenre));
-            quantityTV.setText(String.valueOf(currQuantity));
-            priceTV.setText(String.valueOf(currPrice));
-            supplierNameTV.setText(currSName);
-            supplierPhoneTV.setText(currSPhone);
-
+            mTitleTV.setText(currTitle);
+            mAuthorTV.setText(currAuthor);
+            mGenreTV.setText(getGenreWithIndex(currGenre));
+            mQuantityTV.setText(String.valueOf(currQuantity));
+            mPriceTV.setText(String.valueOf(currPrice));
+            mSupplierNameTV.setText(currSName);
+            mSupplierPhoneTV.setText(currSPhone);
         }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-    }
+    public void onLoaderReset(Loader<Cursor> loader) { }
 
     private void getDataFromPreviousActivity() {
         Intent intent = getIntent();
@@ -148,7 +155,6 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
                 return getString(R.string.genre_non_fiction);
             default:
                 return getString(R.string.not_decided);
-
         }
     }
 
@@ -196,7 +202,73 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
                         Toast.LENGTH_SHORT).show();
             }
         }
-        finish();
+        finish(); // Finish the current activity
+    }
+
+    // set setClickableImageViews for increase, decrease and order buttons
+    private void setClickableImageViews() {
+
+        // decrease ImageView
+        final ImageView decreaseIV = findViewById(R.id.decreaseImageView);
+        decreaseIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String quantityString = mQuantityTV.getText().toString().trim();
+                String stringValue = quantityString.matches("") ? "0" : quantityString;
+                int quantity = Integer.parseInt(stringValue);
+                updateQuantity(quantity, false);
+            }
+        });
+
+        // Increase ImageView
+        ImageView increaseIV = findViewById(R.id.increaseImageView);
+        increaseIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String quantityString = mQuantityTV.getText().toString().trim();
+                String stringValue = quantityString.matches("") ? "0" : quantityString;
+                int quantity = Integer.parseInt(stringValue);
+                updateQuantity(quantity, true);
+            }
+        });
+
+        // Order (Call) ImageView
+        ImageView orderIV = findViewById(R.id.orderImageView);
+        orderIV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // call phone app API
+                String phone = mSupplierPhoneTV.getText().toString().trim();
+                Intent phoneIntent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phone, null));
+                PackageManager packageManager = getBaseContext().getPackageManager();
+                if (phoneIntent.resolveActivity(packageManager) == null) {
+                    Toast.makeText(getApplicationContext(), getString(R.string.no_internet_available), Toast.LENGTH_SHORT).show();
+                } else {
+                    startActivity(phoneIntent);
+                }
+            }
+        });
+
+    }
+
+    private void updateQuantity(int quantity, boolean isIncreasing) {
+
+        int currValue;
+        if (isIncreasing) { // increase by 1
+            currValue = quantity + 1;
+            ContentValues values = new ContentValues();
+            values.put(BookEntry.COLUMN_QUANTITY, currValue);
+            getContentResolver().update(mCurrentBookUri, values, null, null);
+        } else { // decrease by 1
+            if (quantity == 0) {
+                Toast.makeText(getApplicationContext(), R.string.no_negative, Toast.LENGTH_SHORT).show();
+            } else {
+                currValue = quantity - 1;
+                ContentValues values = new ContentValues();
+                values.put(BookEntry.COLUMN_QUANTITY, currValue);
+                getContentResolver().update(mCurrentBookUri, values, null, null);
+            }
+        }
     }
 
     private void goToEditorBook() {
@@ -208,11 +280,5 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
         intent.setData(currentBookUri);
         // launch the bookDetailActivity to display the dta for the current book
         startActivity(intent);
-    }
-
-    // Go to MainList for Books
-    private void goToMainList() {
-        Intent _MainListActivity = new Intent(getApplicationContext(), MainListActivity.class);
-        startActivity(_MainListActivity);
     }
 }

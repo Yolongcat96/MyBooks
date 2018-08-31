@@ -1,16 +1,20 @@
 package com.example.android.mybooks;
 
+import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -20,12 +24,12 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.example.android.mybooks.data.BookContract.BookEntry;
 import com.example.android.mybooks.data.BookDbHelper;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private final String TAG_DEBUG = this.getClass().getSimpleName();
     private static final int EXISTING_BOOK_LOADER = 0;
     private Uri mCurrentBookUri;
     private boolean mBookHasChanged = false;
@@ -75,10 +79,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private int quantity;
     private double price;
 
-    // SQlite related variables
+    // SQLite related variables
     private BookDbHelper mDbHelper;
     private int bookRowId;
-    private String bookID;
     private Cursor mCursor;
 
     /**
@@ -91,17 +94,161 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+        // Get data from the previous activity
+        getDataFromPreviousActivity();
+        // Set title
+        setTitle();
         // Set input values
         setInputValues();
         // Setup spinner
         setupSpinner();
-        // Get data from the previous activity
-        //getInformationFromPreviousActivity();
-        getDataFromPreviousActivity();
-        // Set title
-        setTitle();
         // kick off the loader
         getLoaderManager().initLoader(EXISTING_BOOK_LOADER, null, this);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        // Define projection
+        String[] projection = {
+                BookEntry._ID,
+                BookEntry.COLUMN_BOOK_TITLE,
+                BookEntry.COLUMN_AUTHOR_NAME,
+                BookEntry.COLUMN_GENRE,
+                BookEntry.COLUMN_QUANTITY,
+                BookEntry.COLUMN_PRICE,
+                BookEntry.COLUMN_SUPPLIER_NAME,
+                BookEntry.COLUMN_SUPPLIER_PHONE
+        };
+        if (mCurrentBookUri == null) {
+            return null;
+        } else {
+            return new CursorLoader(this,
+                    mCurrentBookUri,
+                    projection,
+                    null,
+                    null,
+                    null);
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            // Find the columns of pet attributes that we're interested in
+            int IDCI = cursor.getColumnIndex(BookEntry._ID);
+            int titleCI = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE); // Book title column index
+            int authorCI = cursor.getColumnIndex(BookEntry.COLUMN_AUTHOR_NAME);
+            int genreCI = cursor.getColumnIndex(BookEntry.COLUMN_GENRE);
+            int quantityCI = cursor.getColumnIndex(BookEntry.COLUMN_QUANTITY);
+            int priceCI = cursor.getColumnIndex(BookEntry.COLUMN_PRICE);
+            int supplierNameCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_NAME);
+            int supplierPhoneCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_PHONE);
+            // Extract out the value from the Cursor for the given column index
+            String bookID = cursor.getString(IDCI);
+            String currTitle = cursor.getString(titleCI);
+            String currAuthor = cursor.getString(authorCI);
+            int currGenre = cursor.getInt(genreCI);
+            int currQuantity = cursor.getInt(quantityCI);
+            double currPrice = cursor.getDouble(priceCI);
+            String currSName = cursor.getString(supplierNameCI);
+            String currSPhone = cursor.getString(supplierPhoneCI);
+            // Set text on EditText
+            mBookTitleEditText.setText(currTitle);
+            mAuthorNameEditText.setText(currAuthor);
+            mQuantityEditText.setText(String.valueOf(currQuantity));
+            mPriceEditText.setText(String.valueOf(currPrice));
+            mSupplierNameEditText.setText(currSName);
+            mSupplierPhoneEditText.setText(currSPhone);
+            // set the received genre info
+            mGenreSpinner.setSelection(currGenre);
+
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mBookTitleEditText.setText("");
+        mAuthorNameEditText.setText("");
+        mQuantityEditText.setText(String.valueOf(0));
+        mPriceEditText.setText(String.valueOf(0.0));
+        mSupplierNameEditText.setText("");
+        mSupplierPhoneEditText.setText("");
+        // set the received genre info into default
+        mGenreSpinner.setSelection(0);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu options from the res/menu/menu_editor.xml file.
+        // This adds menu items to the app bar.
+        getMenuInflater().inflate(R.menu.menu_editor, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // User clicked on a menu option in the app bar overflow menu
+        switch (item.getItemId()) {
+            // Respond to a click on the "Save" menu option
+            case R.id.action_save:
+                actionSave();
+                return true;
+            case android.R.id.home:
+                // exit activity
+                goPreviousActivity();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void goPreviousActivity() {
+        // Check if there is changed unless clicking save button
+        if (!mBookHasChanged) {
+            if (mCurrentBookUri == null) {
+                NavUtils.navigateUpFromSameTask(EditorActivity.this); // go to the main list
+            } else {
+                finish(); // go to the book overview
+            }
+        }
+
+        DialogInterface.OnClickListener discardButtonClickListener =
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // User clicked "Discard" button, navigate to parent activity.
+                        if (mCurrentBookUri == null) {
+                            NavUtils.navigateUpFromSameTask(EditorActivity.this); // go to the main list
+                        } else {
+                            finish(); // go to the book overview
+                        }
+                    }
+                };
+
+        // Show a dialog that notifies the user they have unsaved changes
+        showUnsavedChangesDialog(discardButtonClickListener);
+    }
+
+    // Show the confirmation popup to make sure if the user want to discard the changed contents.
+    private void showUnsavedChangesDialog(
+            DialogInterface.OnClickListener discardButtonClickListener) {
+        // Create an AlertDialog.Builder and set the message, and click listeners
+        // for the positive and negative buttons on the dialog.
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.unsaved_changes_dialog_msg);
+        builder.setPositiveButton(R.string.discard, discardButtonClickListener);
+        builder.setNegativeButton(R.string.keep_editing, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User clicked the "Keep editing" button, so dismiss the dialog
+                // and continue editing the book.
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
+
+        // Create and show the AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
     }
 
     private void getDataFromPreviousActivity() {
@@ -109,15 +256,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mCurrentBookUri = intent.getData();
     }
 
-    private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
+    private final View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            mBookHasChanged = true;
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+                mBookHasChanged = true;
+            }
             return false;
         }
     };
 
     private void setInputValues() {
+
         mBookTitleEditText = findViewById(R.id.edit_book_title);
         mAuthorNameEditText = findViewById(R.id.edit_author_name);
         mGenreSpinner = findViewById(R.id.spinner_genre);
@@ -134,6 +284,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mSupplierNameEditText.setOnTouchListener(mTouchListener);
         mSupplierPhoneEditText.setOnTouchListener(mTouchListener);
 
+        // Check the test change for only the first EditText because the firs time it is activated so that it can't detect the touch event.
+        mBookTitleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+            @Override
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+                mBookHasChanged = true;
+            }
+        });
     }
 
     private void setTitle() {
@@ -202,33 +366,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         supplierNameString = mSupplierNameEditText.getText().toString().trim();
         supplierPhoneString = mSupplierPhoneEditText.getText().toString().trim();
         quantityString = mQuantityEditText.getText().toString().trim();
-        quantity = Integer.parseInt(quantityString);
-        priceString = mPriceEditText.getText().toString().trim();
-        price = Double.parseDouble(priceString);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu options from the res/menu/menu_editor.xml file.
-        // This adds menu items to the app bar.
-        getMenuInflater().inflate(R.menu.menu_editor, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // User clicked on a menu option in the app bar overflow menu
-        switch (item.getItemId()) {
-            // Respond to a click on the "Save" menu option
-            case R.id.action_save:
-                actionSave();
-                return true;
-            case android.R.id.home:
-                // exit activity
-                goToMainList();
-                return true;
+        if (TextUtils.isEmpty(quantityString)) {
+            quantity = 0;
+        } else {
+            quantity = Integer.parseInt(quantityString);
         }
-        return super.onOptionsItemSelected(item);
+        priceString = mPriceEditText.getText().toString().trim();
+        if (TextUtils.isEmpty(priceString)) {
+            price = 0.0;
+        } else {
+            price = Double.parseDouble(priceString);
+        }
     }
 
     // Get user input from editor and save new pet into database.
@@ -261,16 +409,24 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
 
         }
-
     }
 
     private void update() {
-        // 1. update the object from the database
-        SQLiteDatabase db = mDbHelper.getWritableDatabase();
+        // get the data from the user
+        getInfoFromUser();
+        // Create a ContentValues object where column names are the keys,
+        // and book attributes from the editor are the values.
+        // create content values
         ContentValues values = setValues();
-        db.update(BookEntry.TABLE_NAME, values, BookEntry._ID + "=?", new String[]{bookID});
-        db.close();
-
+        // show a toast message depending on whether or not the insertion was successful
+        int rowsAffected = getContentResolver().update(mCurrentBookUri, values, null, null);
+        if (rowsAffected == 0) {
+            Toast.makeText(this, getString(R.string.editor_insert_book_failed),
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.editor_insert_book_successful),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void actionSave() {
@@ -279,14 +435,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             if (mCurrentBookUri != null) {
                 // Update the information of the chosen book and i to the database
                 update();
-                // Go to the MainList
-                goToMainList();
             } else {
                 // Insert the new book to the database
                 saveBook();
-                // Go to the MainList
-                goToMainList();
             }
+
+            finish();
         }
     }
 
@@ -313,86 +467,19 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         } else if (TextUtils.isEmpty(supplierPhoneString)) {
             Toast.makeText(this, getString(R.string.no_supplier_phone), Toast.LENGTH_SHORT).show();
             return false;
+        } else if (!checkCorrectPhoneNumberFormat(supplierPhoneString)) {
+            Toast.makeText(this, getString(R.string.no_enough_phone_length), Toast.LENGTH_SHORT).show();
+            return false;
         } else {
             return true;
         }
-
     }
 
-    // Go to MainList for Books
-    private void goToMainList() {
-        Intent _MainListActivity = new Intent(getApplicationContext(), MainListActivity.class);
-        startActivity(_MainListActivity);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // Define projection
-        String[] projection = {
-                BookEntry._ID,
-                BookEntry.COLUMN_BOOK_TITLE,
-                BookEntry.COLUMN_AUTHOR_NAME,
-                BookEntry.COLUMN_GENRE,
-                BookEntry.COLUMN_QUANTITY,
-                BookEntry.COLUMN_PRICE,
-                BookEntry.COLUMN_SUPPLIER_NAME,
-                BookEntry.COLUMN_SUPPLIER_PHONE
-        };
-        if (mCurrentBookUri == null) {
-            return null;
-        } else {
-            return new CursorLoader(this,
-                    mCurrentBookUri,
-                    projection,
-                    null,
-                    null,
-                    null);
-        }
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor.moveToFirst()) {
-            // Find the columns of pet attributes that we're interested in
-            int IDCI = cursor.getColumnIndex(BookEntry._ID);
-            int titleCI = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE); // Book title column index
-            int authorCI = cursor.getColumnIndex(BookEntry.COLUMN_AUTHOR_NAME);
-            int genreCI = cursor.getColumnIndex(BookEntry.COLUMN_GENRE);
-            int quantityCI = cursor.getColumnIndex(BookEntry.COLUMN_QUANTITY);
-            int priceCI = cursor.getColumnIndex(BookEntry.COLUMN_PRICE);
-            int supplierNameCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_NAME);
-            int supplierPhoneCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_PHONE);
-            // Extract out the value from the Cursor for the given column index
-            bookID = cursor.getString(IDCI);
-            String currTitle = cursor.getString(titleCI);
-            String currAuthor = cursor.getString(authorCI);
-            int currGenre = cursor.getInt(genreCI);
-            int currQuantity = cursor.getInt(quantityCI);
-            double currPrice = cursor.getDouble(priceCI);
-            String currSName = cursor.getString(supplierNameCI);
-            String currSPhone = cursor.getString(supplierPhoneCI);
-            // Set text on EditText
-            mBookTitleEditText.setText(currTitle);
-            mAuthorNameEditText.setText(currAuthor);
-            mQuantityEditText.setText(String.valueOf(currQuantity));
-            mPriceEditText.setText(String.valueOf(currPrice));
-            mSupplierNameEditText.setText(currSName);
-            mSupplierPhoneEditText.setText(currSPhone);
-            // set the received genre info
-            mGenreSpinner.setSelection(currGenre);
-
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mBookTitleEditText.setText("");
-        mAuthorNameEditText.setText("");
-        mQuantityEditText.setText(String.valueOf(0));
-        mPriceEditText.setText(String.valueOf(0.0));
-        mSupplierNameEditText.setText("");
-        mSupplierPhoneEditText.setText("");
-        // set the received genre info
-        mGenreSpinner.setSelection(0);
+    private boolean checkCorrectPhoneNumberFormat(String phoneNumber) {
+        final int MINIMUM_LENGTH = 10;
+        String regexStr = "^[0-9]*$";
+        int length = phoneNumber.length();
+        // check if they are numbers and over than minimum length
+        return phoneNumber.trim().matches(regexStr) && length >= MINIMUM_LENGTH;
     }
 }

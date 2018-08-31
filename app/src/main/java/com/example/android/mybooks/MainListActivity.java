@@ -23,12 +23,8 @@ import com.example.android.mybooks.data.BookCursorAdapter;
 
 public class MainListActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    //private Cursor mCursor;
-    // Tag for the log messages
-    public static final String LOG_TAG = MainListActivity.class.getSimpleName();
-
     private static final int BOOK_LOADER = 0;
-    BookCursorAdapter mCursorAdapter;
+    private BookCursorAdapter mCursorAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,37 +100,10 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
         values.put(BookEntry.COLUMN_QUANTITY, 1);
         values.put(BookEntry.COLUMN_PRICE, 3.99);
         values.put(BookEntry.COLUMN_SUPPLIER_NAME, "Nation Inc.");
-        values.put(BookEntry.COLUMN_SUPPLIER_PHONE, "123-456-7899");
+        values.put(BookEntry.COLUMN_SUPPLIER_PHONE, "1234567899");
         Uri newUri = getContentResolver().insert(BookEntry.CONTENT_URI, values);
 
     }
-    // Temporary helper method to display information in the on screen TextView about the state of the pets database
-//    private void getCurrentCursor() {
-//        // To access our database, we instantiate our subclass of SQLiteOpenHolder
-//        // and pass the context, which is the current activity
-//        BookDbHelper mDbHelper = new BookDbHelper(this);
-//        // create and open a database to read from it
-//        SQLiteDatabase db = mDbHelper.getReadableDatabase();
-//        String[] projection = {
-//                BookEntry._ID,
-//                BookEntry.COLUMN_BOOK_TITLE,
-//                BookEntry.COLUMN_AUTHOR_NAME,
-//                BookEntry.COLUMN_GENRE,
-//                BookEntry.COLUMN_QUANTITY,
-//                BookEntry.COLUMN_PRICE,
-//                BookEntry.COLUMN_SUPPLIER_NAME,
-//                BookEntry.COLUMN_SUPPLIER_PHONE
-//        };
-//        mCursor = db.query(
-//                BookEntry.TABLE_NAME,
-//                projection,
-//                null,
-//                null,
-//                null,
-//                null,
-//                null);
-//
-//    }
 
     private void setTitle() {
         getSupportActionBar().setTitle(getResources().getString(R.string.list_top_title));
@@ -161,13 +130,17 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
                 goToEditorBook();
             }
         });
-
     }
 
     private void deleteAllBooks() {
         int rowsDeleted = getContentResolver().delete(BookEntry.CONTENT_URI, null, null);
-        Toast.makeText(this, getString(R.string.delete_all_successfully),
-                Toast.LENGTH_SHORT).show();
+        if (rowsDeleted == 0) {
+            Toast.makeText(this, getString(R.string.delete_all_successfully),
+                    Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, getString(R.string.delete_all_fail),
+                    Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -199,5 +172,24 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursorAdapter.swapCursor(null);
+    }
+
+    public void sellBook(int bookId, int quantity) {
+
+        if (quantity > 0) {
+            // decrease the number of book
+            int curQuantity = quantity - 1;
+            // update the database and display
+            ContentValues values = new ContentValues();
+            values.put(BookEntry.COLUMN_QUANTITY, curQuantity);
+            Uri currentUri = ContentUris.withAppendedId(BookEntry.CONTENT_URI, bookId);
+            int rowsUpdated = getContentResolver().update(currentUri, values, null, null);
+            if (rowsUpdated == 1) {
+                Toast.makeText(this, R.string.sell_one_book, Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            Toast.makeText(this,getString(R.string.no_more_book), Toast.LENGTH_SHORT).show();
+        }
     }
 }
