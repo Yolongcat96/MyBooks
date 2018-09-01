@@ -24,12 +24,11 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import com.example.android.mybooks.data.BookContract.BookEntry;
-import com.example.android.mybooks.data.BookDbHelper;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String TAG_DEBUG = this.getClass().getSimpleName();
     private static final int EXISTING_BOOK_LOADER = 0;
     private Uri mCurrentBookUri;
     private boolean mBookHasChanged = false;
@@ -78,11 +77,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private String priceString;
     private int quantity;
     private double price;
-
-    // SQLite related variables
-    private BookDbHelper mDbHelper;
-    private int bookRowId;
-    private Cursor mCursor;
 
     /**
      * Gender of the pet. The possible values are:
@@ -135,7 +129,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
             // Find the columns of pet attributes that we're interested in
-            int IDCI = cursor.getColumnIndex(BookEntry._ID);
             int titleCI = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE); // Book title column index
             int authorCI = cursor.getColumnIndex(BookEntry.COLUMN_AUTHOR_NAME);
             int genreCI = cursor.getColumnIndex(BookEntry.COLUMN_GENRE);
@@ -144,7 +137,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int supplierNameCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_NAME);
             int supplierPhoneCI = cursor.getColumnIndex(BookEntry.COLUMN_SUPPLIER_PHONE);
             // Extract out the value from the Cursor for the given column index
-            String bookID = cursor.getString(IDCI);
             String currTitle = cursor.getString(titleCI);
             String currAuthor = cursor.getString(authorCI);
             int currGenre = cursor.getInt(genreCI);
@@ -210,7 +202,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 finish(); // go to the book overview
             }
         }
-
         DialogInterface.OnClickListener discardButtonClickListener =
                 new DialogInterface.OnClickListener() {
                     @Override
@@ -223,7 +214,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         }
                     }
                 };
-
         // Show a dialog that notifies the user they have unsaved changes
         showUnsavedChangesDialog(discardButtonClickListener);
     }
@@ -245,7 +235,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 }
             }
         });
-
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -267,7 +256,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     };
 
     private void setInputValues() {
-
         mBookTitleEditText = findViewById(R.id.edit_book_title);
         mAuthorNameEditText = findViewById(R.id.edit_author_name);
         mGenreSpinner = findViewById(R.id.spinner_genre);
@@ -283,15 +271,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mPriceEditText.setOnTouchListener(mTouchListener);
         mSupplierNameEditText.setOnTouchListener(mTouchListener);
         mSupplierPhoneEditText.setOnTouchListener(mTouchListener);
-
         // Check the test change for only the first EditText because the firs time it is activated so that it can't detect the touch event.
         mBookTitleEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+            }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start,
                                           int count, int after) {
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start,
                                       int before, int count) {
@@ -439,7 +429,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 // Insert the new book to the database
                 saveBook();
             }
-
             finish();
         }
     }

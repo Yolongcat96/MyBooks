@@ -54,9 +54,9 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/book_author_color"
-            android:textSize="18sp"
-            tools:text="J.K.Rowling"
-            tools:targetApi="jelly_bean" />
+            android:textSize="@dimen/item_text_size"
+            tools:targetApi="jelly_bean"
+            tools:text="J.K.Rowling" />
     </LinearLayout>
 
     <!-- Genre category -->
@@ -80,7 +80,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/other_item_color"
-            android:textSize="18sp"
+            android:textSize="@dimen/item_text_size"
             tools:text="Fantasy" />
     </LinearLayout>
 
@@ -111,7 +111,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/book_price_color"
-            android:textSize="18sp"
+            android:textSize="@dimen/item_text_size"
             tools:text="10" />
 
     </LinearLayout>
@@ -130,31 +130,35 @@
 
         <ImageView
             android:id="@+id/decreaseImageView"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginRight="15dp"
+            android:layout_width="@dimen/small_icon_size"
+            android:layout_height="@dimen/small_icon_size"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_decrease_btn" />
+            android:scaleType="centerInside"
+            android:layout_marginRight="@dimen/imageview_margin"
+            android:src="@drawable/ic_decrease_btn"
+            android:contentDescription="TODO" />
         <!-- Text -->
         <TextView
             android:id="@+id/quantity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
+            android:layout_gravity="center_vertical"
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/other_item_color"
-            android:textSize="18sp"
+            android:textSize="@dimen/item_text_size"
             tools:text="2" />
 
         <ImageView
             android:id="@+id/increaseImageView"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="@dimen/small_icon_size"
+            android:layout_height="@dimen/small_icon_size"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="15dp"
-            android:src="@drawable/ic_increase_btn" />
-            android:src="@drawable/ic_increase_btn" />
+            android:scaleType="centerInside"
+            android:layout_marginLeft="@dimen/imageview_margin"
+            android:src="@drawable/ic_increase_btn"
+            android:contentDescription="TODO" />
 
     </LinearLayout>
 
@@ -179,7 +183,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/other_item_color"
-            android:textSize="18sp"
+            android:textSize="@dimen/item_text_size"
             tools:text="ABC publish Inc." />
     </LinearLayout>
 
@@ -204,7 +208,7 @@
             android:fontFamily="sans-serif-medium"
             android:maxLines="3"
             android:textColor="@color/other_item_color"
-            android:textSize="18sp"
+            android:textSize="@dimen/item_text_size"
             tools:text="6506446078" />
     </LinearLayout>
 
@@ -214,6 +218,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_margin="25dp"
-        android:src="@drawable/ic_order_btn" />
+        android:src="@drawable/ic_order_btn"
+        android:contentDescription="TODO" />
 
 </LinearLayout>

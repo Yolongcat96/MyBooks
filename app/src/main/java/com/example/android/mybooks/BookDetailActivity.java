@@ -1,9 +1,9 @@
 package com.example.android.mybooks;
 
-import android.content.ContentValues;
 import android.app.AlertDialog;
 import android.app.LoaderManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,7 +24,6 @@ import com.example.android.mybooks.data.BookContract.BookEntry;
 
 public class BookDetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String TAG_DEBUG = this.getClass().getSimpleName();
     private static final int EXISTING_PET_LOADER = 0;
     private Uri mCurrentBookUri;
     private long currentBookId;
@@ -77,20 +76,9 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        // Define projection
-        String[] projection = {
-                BookEntry._ID,
-                BookEntry.COLUMN_BOOK_TITLE,
-                BookEntry.COLUMN_AUTHOR_NAME,
-                BookEntry.COLUMN_GENRE,
-                BookEntry.COLUMN_QUANTITY,
-                BookEntry.COLUMN_PRICE,
-                BookEntry.COLUMN_SUPPLIER_NAME,
-                BookEntry.COLUMN_SUPPLIER_PHONE
-        };
         return new CursorLoader(this,
                 mCurrentBookUri,
-                projection,
+                null,
                 null,
                 null,
                 null);
@@ -135,7 +123,8 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> loader) { }
+    public void onLoaderReset(Loader<Cursor> loader) {
+    }
 
     private void getDataFromPreviousActivity() {
         Intent intent = getIntent();
@@ -207,7 +196,6 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
 
     // set setClickableImageViews for increase, decrease and order buttons
     private void setClickableImageViews() {
-
         // decrease ImageView
         final ImageView decreaseIV = findViewById(R.id.decreaseImageView);
         decreaseIV.setOnClickListener(new View.OnClickListener() {
@@ -219,7 +207,6 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
                 updateQuantity(quantity, false);
             }
         });
-
         // Increase ImageView
         ImageView increaseIV = findViewById(R.id.increaseImageView);
         increaseIV.setOnClickListener(new View.OnClickListener() {
@@ -231,7 +218,6 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
                 updateQuantity(quantity, true);
             }
         });
-
         // Order (Call) ImageView
         ImageView orderIV = findViewById(R.id.orderImageView);
         orderIV.setOnClickListener(new View.OnClickListener() {
@@ -252,7 +238,6 @@ public class BookDetailActivity extends AppCompatActivity implements LoaderManag
     }
 
     private void updateQuantity(int quantity, boolean isIncreasing) {
-
         int currValue;
         if (isIncreasing) { // increase by 1
             currValue = quantity + 1;

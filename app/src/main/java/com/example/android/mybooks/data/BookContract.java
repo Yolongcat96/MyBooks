@@ -13,7 +13,8 @@ public class BookContract {
 
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor
-    private BookContract() { }
+    private BookContract() {
+    }
 
     // Inner class that defines constant values for the books database table
     // Each entry in the table represents a single book
@@ -37,13 +38,6 @@ public class BookContract {
 
         // Book Genre:TEXT
         public final static String COLUMN_GENRE = "genre";
-
-        // possible for the genre
-        public static final int GENRE_NOVEL = 0;
-        public static final int GENRE_FANTASY = 1;
-        public static final int GENRE_HISTORICAL_FICTION = 2;
-        public static final int GENRE_NON_FICTION = 3;
-        public static final int GENRE_ROMANCE = 4;
 
         // Book Quantity: Integer
         public final static String COLUMN_QUANTITY = "quantity";

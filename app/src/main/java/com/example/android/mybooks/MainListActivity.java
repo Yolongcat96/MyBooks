@@ -30,7 +30,7 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_list);
-        // Set the title
+        /* Set the title */
         setTitle();
         // Set the floating button
         setFloatingButton();
@@ -101,7 +101,7 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
         values.put(BookEntry.COLUMN_PRICE, 3.99);
         values.put(BookEntry.COLUMN_SUPPLIER_NAME, "Nation Inc.");
         values.put(BookEntry.COLUMN_SUPPLIER_PHONE, "1234567899");
-        Uri newUri = getContentResolver().insert(BookEntry.CONTENT_URI, values);
+        getContentResolver().insert(BookEntry.CONTENT_URI, values);
 
     }
 
@@ -118,7 +118,6 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
 
     private void goToEditorBook() {
         Intent editorActivity = new Intent(MainListActivity.this, EditorActivity.class);
-        //editorActivity.putExtra(getString(R.string.callingAct), getString(R.string.MainList));
         startActivity(editorActivity);
     }
 
@@ -175,7 +174,6 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
     }
 
     public void sellBook(int bookId, int quantity) {
-
         if (quantity > 0) {
             // decrease the number of book
             int curQuantity = quantity - 1;
@@ -189,7 +187,7 @@ public class MainListActivity extends AppCompatActivity implements LoaderManager
             }
 
         } else {
-            Toast.makeText(this,getString(R.string.no_more_book), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.no_more_book), Toast.LENGTH_SHORT).show();
         }
     }
 }

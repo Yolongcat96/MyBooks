@@ -39,7 +39,6 @@ public class BookCursorAdapter extends CursorAdapter {
         TextView priceView = view.findViewById(R.id.book_price);
         TextView quantityTextView = view.findViewById(R.id.book_quantity);
         ImageView thumnailView = view.findViewById(R.id.article_thumbnail);
-
         // get column index
         int idColumnIndex = cursor.getColumnIndex(BookEntry._ID);
         int titleColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_BOOK_TITLE);
@@ -47,7 +46,6 @@ public class BookCursorAdapter extends CursorAdapter {
         int priceColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_PRICE);
         int quantityColumnIndex = cursor.getColumnIndex(BookEntry.COLUMN_QUANTITY);
         final int bookIdColumnindex = cursor.getInt(cursor.getColumnIndex(BookEntry._ID));
-
         // get variables from the Cursor for the current chosen book
         final int bookID = cursor.getInt(idColumnIndex);
         String bookTitle = cursor.getString(titleColumnIndex);
@@ -61,7 +59,6 @@ public class BookCursorAdapter extends CursorAdapter {
         int imageIndex = bookIdColumnindex % 4;
         thumnailView.setImageResource(sampleBookImages[imageIndex]);
         quantityTextView.setText(" (Stock:" + String.valueOf(quantity) + ")");
-
         // sale image clickable
         ImageView imgView = view.findViewById(R.id.sale_btn);
         imgView.setOnClickListener(new View.OnClickListener() {

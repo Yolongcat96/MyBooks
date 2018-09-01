@@ -13,7 +13,7 @@
         android:layout_margin="10dp"
         android:background="@color/list_box_color"
         android:divider="@android:color/white"
-        android:dividerHeight="10sp" />
+        android:dividerHeight="10dp" />
 
     <RelativeLayout
         android:id="@+id/empty_view"
@@ -26,7 +26,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:src="@drawable/ic_no_list" />
+            android:src="@drawable/ic_no_list"
+            android:contentDescription="TODO" />
 
         <TextView
             android:id="@+id/empty_title_text"
